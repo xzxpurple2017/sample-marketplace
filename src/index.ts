@@ -1,5 +1,6 @@
 import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
+import sqlite3 from 'sqlite3';
 
 // A schema is a collection of type definitions (hence "typeDefs")
 // that together define the "shape" of queries that are executed against
@@ -7,36 +8,45 @@ import { startStandaloneServer } from '@apollo/server/standalone';
 const typeDefs = `#graphql
   # Comments in GraphQL strings (such as this one) start with the hash (#) symbol.
 
-  # This "Book" type defines the queryable fields for every book in our data source.
-  type Book {
-    title: String
-    author: String
+  # This "User" type defines the queryable fields for every user in our data source.
+  type User {
+    id: ID
+    publicId: String
+    email: String
+    cognitoId: String
+    firstName: String
+    lastName: String
+    phone: String
+    createdAt: String
+    updatedAt: String
   }
 
   # The "Query" type is special: it lists all of the available queries that
   # clients can execute, along with the return type for each. In this
-  # case, the "books" query returns an array of zero or more Books (defined above).
+  # case, the "users" query returns an array of zero or more Users (defined above).
   type Query {
-    books: [Book]
+    users: [User]
   }
 `;
 
-const books = [
-  {
-    title: 'The Awakening',
-    author: 'Kate Chopin',
-  },
-  {
-    title: 'City of Glass',
-    author: 'Paul Auster',
-  },
-];
+// Open the database
+const db = new sqlite3.Database('marketplace.db');
 
 // Resolvers define how to fetch the types defined in your schema.
-// This resolver retrieves books from the "books" array above.
+// This resolver retrieves users from the "users" table in the database.
 const resolvers = {
   Query: {
-    books: () => books,
+    users: () => {
+      return new Promise((resolve, reject) => {
+        db.all('SELECT * FROM users', (err, rows) => {
+          if (err) {
+            reject([]);
+          } else {
+            resolve(rows);
+          }
+        });
+      });
+    },
   },
 };
 
