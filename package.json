@@ -17,7 +17,6 @@
     "@prisma/client": "^5.22.0",
     "cors": "^2.8.5",
     "graphql": "^16.9.0",
-    "sqlite3": "^5.1.7",
     "supertest": "^7.0.0"
   },
   "devDependencies": {

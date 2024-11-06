@@ -1,6 +1,6 @@
 import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
-import sqlite3 from 'sqlite3';
+import { PrismaClient } from '@prisma/client';
 
 // A schema is a collection of type definitions (hence "typeDefs")
 // that together define the "shape" of queries that are executed against
@@ -26,25 +26,39 @@ const typeDefs = `#graphql
   # case, the "users" query returns an array of zero or more Users (defined above).
   type Query {
     users: [User]
+    user(publicId: ID!): User
+  }
+
+  type Mutation {
+    addUser(email: String!, cognitoId: String!, firstName: String, lastName: String, phone: String): User
   }
 `;
 
-// Open the database
-const db = new sqlite3.Database('marketplace.db');
+const prisma = new PrismaClient();
 
 // Resolvers define how to fetch the types defined in your schema.
 // This resolver retrieves users from the "users" table in the database.
 const resolvers = {
   Query: {
-    users: () => {
-      return new Promise((resolve, reject) => {
-        db.all('SELECT * FROM users', (err, rows) => {
-          if (err) {
-            reject([]);
-          } else {
-            resolve(rows);
-          }
-        });
+    users: async () => {
+      return await prisma.user.findMany();
+    },
+    user: async (_, { publicId }) => {
+      return await prisma.user.findUnique({
+        where: { publicId },
+      });
+    },
+  },
+  Mutation: {
+    addUser: async (_, { email, cognitoId, firstName, lastName, phone }) => {
+      return await prisma.user.create({
+        data: {
+          email,
+          cognitoId,
+          firstName,
+          lastName,
+          phone,
+        },
       });
     },
   },
