@@ -6,6 +6,7 @@ import { typeDefs } from '@utils/schema';
 import { resolvers } from '@utils/resolvers';
 import { expressMiddleware } from '@apollo/server/express4';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
+import { loggerPlugin } from '@utils/logger';
 
 // Initialize Express app
 const app = express();
@@ -16,7 +17,10 @@ const httpServer = http.createServer(app);
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+  plugins: [
+    loggerPlugin,
+    ApolloServerPluginDrainHttpServer({ httpServer }),
+  ],
 });
 
 await server.start();

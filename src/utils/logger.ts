@@ -1,33 +1,40 @@
 import { createLogger, format, transports } from 'winston';
-import { service, environment } from "@utils/config";
+import { v4 as uuidv4 } from 'uuid';
 
 const logger = createLogger({
   level: 'info',
   format: format.combine(
-    format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-    format.errors({ stack: true }),
-    format.splat(),
-    format.json()
+    format.timestamp(),
+    format.printf(({ timestamp, level, message }) => {
+      return `${timestamp} [${level}]: ${message}`;
+    })
   ),
-  defaultMeta: { 
-    service: service,
-    environment: environment
-  },
   transports: [
-    new transports.File({ filename: 'error.log', level: 'error' }),
-    new transports.File({ filename: 'combined.log' }),
+    new transports.Console(),
   ],
 });
 
-// If we're not in production then log to the `console` with the format:
-// `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
-if (process.env.NODE_ENV !== 'production') {
-  logger.add(new transports.Console({
-    format: format.combine(
-      format.colorize(),
-      format.simple()
-    ),
-  }));
-}
+export const loggerPlugin = {
+  async requestDidStart(requestContext) {
+    const start = Date.now();
+    const query = requestContext.request.query;
+    const requestId = uuidv4();
+    
+    logger.info(`Request started: ID: ${requestId}, Query:\n${query}`);
 
-export default logger;
+    return {
+      async parsingDidStart() {
+        logger.info(`Parsing started! ID: ${requestId}`);
+      },
+      async validationDidStart() {
+        logger.info(`Validation started! ID: ${requestId}`);
+      },
+      async willSendResponse(requestContext) {
+        const duration = Date.now() - start;
+        logger.info(`Request completed. ID: ${requestId}, Duration: ${duration}ms`);
+      }
+    };
+  },
+};
+
+export default loggerPlugin;
