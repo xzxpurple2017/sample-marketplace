@@ -2,7 +2,8 @@ import cors from 'cors';
 import http from 'http';
 import express from 'express';
 import { ApolloServer } from '@apollo/server';
-import { typeDefs, resolvers } from '@utils/schema';
+import { typeDefs } from '@utils/schema';
+import { resolvers } from '@utils/resolvers';
 import { expressMiddleware } from '@apollo/server/express4';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
 
