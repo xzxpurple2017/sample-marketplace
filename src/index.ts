@@ -4,11 +4,15 @@ import express from 'express';
 import { ApolloServer } from '@apollo/server';
 import { typeDefs, resolvers } from '@utils/schema';
 import { expressMiddleware } from '@apollo/server/express4';
+import { authMiddleware } from '@utils/authMiddleware';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
 
 // Initialize Express app
 const app = express();
 const httpServer = http.createServer(app);
+
+// Apply the auth middleware
+//app.use(authMiddleware);
 
 // The ApolloServer constructor requires two parameters: your schema
 // definition and your set of resolvers.

@@ -43,14 +43,14 @@ export const resolvers = {
     users: async () => {
       return await prisma.user.findMany();
     },
-    user: async (_, { publicId }) => {
+    user: async (_: any, { publicId }) => {
       return await prisma.user.findUnique({
         where: { publicId },
       });
     },
   },
   Mutation: {
-    addUser: async (_, { email, cognitoId, firstName, lastName, phone }) => {
+    addUser: async (_: any, { email, cognitoId, firstName, lastName, phone }) => {
       return await prisma.user.create({
         data: {
           email,
