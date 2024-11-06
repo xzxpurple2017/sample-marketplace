@@ -4,12 +4,12 @@
 ```
 npm install
 npx prisma generate
-npm start
+npm run server
 ```
 
 ### Apollo GraphQL web interface
 
-Navigate to http://localhost:4000 in your browser
+Navigate to http://localhost:4000/graphql in your browser
 
 ## Database migrations
 
@@ -37,7 +37,7 @@ curl -X POST http://localhost:4000/graphql \
 ```
 curl -s --request POST \
     --header 'content-type: application/json' \
-    --url http://localhost:4000/ \
+    --url http://localhost:4000/graphql \
     --data '{"query":"query ExampleQuery {\n  users {\n    publicId\n    email\n  }\n}"}' | jq 
 ```
 
@@ -45,6 +45,6 @@ curl -s --request POST \
 ```
 curl --request POST \
     --header 'content-type: application/json' \
-    --url http://localhost:4000/ \
+    --url http://localhost:4000/graphql \
     --data '{"query":"query ExampleQuery($publicId: ID!) {\n  user(publicId: $publicId) {\n    publicId, email, phone, firstName, lastName\n  }\n}","variables":{"publicId":"aa97f402-4195-4fed-bc03-d2c05a2ac578"}}'
 ```

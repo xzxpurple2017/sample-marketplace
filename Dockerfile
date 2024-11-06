@@ -26,4 +26,4 @@ EXPOSE 4000
 RUN npx prisma generate
 
 # Start the application
-ENTRYPOINT ["npm", "start"]
+ENTRYPOINT ["npm", "run", "server"]
