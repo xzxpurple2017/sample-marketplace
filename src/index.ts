@@ -12,13 +12,22 @@ import { loggerPlugin } from '@utils/logger';
 const app = express();
 const httpServer = http.createServer(app);
 
+// Extract JWT token if present
+const extractToken = (req: any, res: any, next: any) => {
+  const authHeader = req.headers['authorization'];
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    req.token = authHeader.split(' ')[1];
+  }
+  next();
+};
+
 // The ApolloServer constructor requires two parameters: your schema
 // definition and your set of resolvers.
 const server = new ApolloServer({
   typeDefs,
   resolvers,
   plugins: [
-    loggerPlugin,
+    //loggerPlugin,
     ApolloServerPluginDrainHttpServer({ httpServer }),
   ],
 });
@@ -31,7 +40,12 @@ app.use(
   // Example: { origin: ['https://www.your-app.example', 'https://studio.apollographql.com'] }
   cors<cors.CorsRequest>({ origin: '*' }),
   express.json(),
-  expressMiddleware(server),
+  extractToken,
+  expressMiddleware(server, {
+    context: async ({ req }) => ({
+      token: req.token,
+    }),
+  }),
 );
 
 await new Promise<void>((resolve) => httpServer.listen({ port: 4000 }, resolve));

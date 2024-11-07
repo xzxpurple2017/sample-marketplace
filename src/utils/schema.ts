@@ -38,6 +38,7 @@ export const typeDefs = `#graphql
   type Query {
     users: [User]
     user(publicId: ID!): User
+    userByToken: User
     addresses: [Address]
     addressByUserPublicId(publicId: ID!): [Address]
   }

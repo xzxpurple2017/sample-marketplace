@@ -10,6 +10,12 @@ export const getUserByPublicId = async (publicId: string) => {
   });
 };
 
+export const getUserByCognitoId = async (cognitoId: string) => {
+  return await prisma.user.findFirst({
+    where: { cognitoId },
+  });
+};
+
 export const createUser = async (email: string, cognitoId: string, firstName?: string, lastName?: string, phone?: string) => {
   return await prisma.user.create({
     data: {
